@@ -1,0 +1,54 @@
+services:
+  # ---------------------------------------------------------------------------
+  # 1. FastAPI Backend Web Service
+  # ---------------------------------------------------------------------------
+  - type: web
+    name: campuspulse-backend
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: SESSION_COOKIE_NAME
+        value: campuspulse_session
+      - key: SESSION_MAX_AGE_SECONDS
+        value: "86400"
+      - key: MEKO_SERVER_URL
+        value: https://mcp.mekodata.ai/mcp
+      - key: MEKO_API_KEY
+        sync: false
+      - key: MEKO_DATAPACK_FRONTDESK
+        value: 318fdc74-eb15-4cf4-9be5-57b5820b3264
+      - key: MEKO_DATAPACK_DISPATCH
+        value: cdb3987f-b677-495f-8d87-01999c3f9b91
+      - key: DEMO_STAFF_TOKENS
+        sync: false
+      - key: DEMO_STUDENT_TOKENS
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+
+  # ---------------------------------------------------------------------------
+  # 2. Next.js Frontend Web Service
+  # ---------------------------------------------------------------------------
+  - type: web
+    name: campuspulse-frontend
+    runtime: node
+    plan: free
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_VERSION
+        value: 20.10.0
+      - key: NEXT_PUBLIC_API_BASE_URL
+        sync: false
